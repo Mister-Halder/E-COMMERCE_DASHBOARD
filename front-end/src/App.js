@@ -13,7 +13,7 @@ import Profile from './components/Profile';
 function App() {
   return (
     <div className="App">
-      <BrowserRouter>
+      <BrowserRouter basename={process.env.PUBLIC_URL}>
       <Nav />
       <Routes>
         <Route element={<PrivateComponent />}>
