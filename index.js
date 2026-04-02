@@ -11,10 +11,22 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:3000', // Only allow requests from the frontend app
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true,
+    origin: "*", // Allow all origins for dev; tighten for production
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
+// Root route for connection health check
+app.get("/", (req, res) => {
+    res.send({ status: "Backend is running!", time: new Date().toISOString() });
+});
+
+// Logging middleware to track requests
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    next();
+});
+
 
 // Serve static images
 app.use('/uploads', express.static('uploads'));
@@ -177,6 +189,6 @@ app.get("/search/:key", verifyToken, async (req, resp) => {
     resp.send(result);
 });
 
-app.listen(5000, () => {
-    console.log("Server is running on port 5000");
+app.listen(5000, "0.0.0.0", () => {
+    console.log("Server is running on http://localhost:5000");
 });

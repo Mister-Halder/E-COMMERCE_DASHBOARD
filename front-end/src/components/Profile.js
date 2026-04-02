@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
+import API_BASE_URL from '../config';
+
 const Profile = () => {
     const auth = localStorage.getItem('user');
     const [userData, setUserData] = useState(auth ? JSON.parse(auth) : null);
@@ -15,34 +17,44 @@ const Profile = () => {
     }, []);
 
     const getUserDetails = async () => {
-        let result = await fetch(`http://localhost:5000/user/${userData._id}`, {
-            headers: {
-                authorization: `bearer ${JSON.parse(localStorage.getItem('token'))}`
+        try {
+            let result = await fetch(`${API_BASE_URL}/user/${userData._id}`, {
+                headers: {
+                    authorization: `bearer ${JSON.parse(localStorage.getItem('token'))}`
+                }
+            });
+            result = await result.json();
+            if (result && !result.result) {
+                setUserData(result);
+                setEditData({ name: result.name, email: result.email });
+                localStorage.setItem('user', JSON.stringify(result)); // Sync local storage
             }
-        });
-        result = await result.json();
-        if (result && !result.result) {
-            setUserData(result);
-            setEditData({ name: result.name, email: result.email });
-            localStorage.setItem('user', JSON.stringify(result)); // Sync local storage
+        } catch (err) {
+            console.error("Get User Details Error:", err);
+            alert(`Failed to fetch user details from ${API_BASE_URL}. Error: ${err.message}`);
         }
     }
 
     const handleUpdateDetails = async () => {
-        let result = await fetch(`http://localhost:5000/user/${userData._id}`, {
-            method: 'PUT',
-            body: JSON.stringify(editData),
-            headers: {
-                'Content-Type': 'application/json',
-                authorization: `bearer ${JSON.parse(localStorage.getItem('token'))}`
+        try {
+            let result = await fetch(`${API_BASE_URL}/user/${userData._id}`, {
+                method: 'PUT',
+                body: JSON.stringify(editData),
+                headers: {
+                    'Content-Type': 'application/json',
+                    authorization: `bearer ${JSON.parse(localStorage.getItem('token'))}`
+                }
+            });
+            result = await result.json();
+            if (result.acknowledged) {
+                setUserData({ ...userData, ...editData });
+                localStorage.setItem('user', JSON.stringify({ ...userData, ...editData }));
+                setIsEditing(false);
+                alert("Profile updated successfully!");
             }
-        });
-        result = await result.json();
-        if (result.acknowledged) {
-            setUserData({ ...userData, ...editData });
-            localStorage.setItem('user', JSON.stringify({ ...userData, ...editData }));
-            setIsEditing(false);
-            alert("Profile updated successfully!");
+        } catch (err) {
+            console.error("Update Details Error:", err);
+            alert(`Failed to update profile at ${API_BASE_URL}. Error: ${err.message}`);
         }
     }
 
@@ -55,23 +67,29 @@ const Profile = () => {
         const formData = new FormData();
         formData.append('profileImage', image);
 
-        let result = await fetch(`http://localhost:5000/upload-profile/${userData._id}`, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                authorization: `bearer ${JSON.parse(localStorage.getItem('token'))}`
-            }
-        });
+        try {
+            let result = await fetch(`${API_BASE_URL}/upload-profile/${userData._id}`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    authorization: `bearer ${JSON.parse(localStorage.getItem('token'))}`
+                }
+            });
 
-        result = await result.json();
-        if (result.profileImage) {
-            setUserData({ ...userData, profileImage: result.profileImage });
-            localStorage.setItem('user', JSON.stringify({ ...userData, profileImage: result.profileImage }));
-            alert("Profile image updated successfully!");
-        } else {
-            alert(result.result || "Upload failed");
+            result = await result.json();
+            if (result.profileImage) {
+                setUserData({ ...userData, profileImage: result.profileImage });
+                localStorage.setItem('user', JSON.stringify({ ...userData, profileImage: result.profileImage }));
+                alert("Profile image updated successfully!");
+            } else {
+                alert(result.result || "Upload failed");
+            }
+        } catch (err) {
+            console.error("Image Upload Error:", err);
+            alert(`Failed to upload image to ${API_BASE_URL}. Error: ${err.message}`);
         }
     }
+
 
     return (
         <div className="product profile-container" style={{ maxWidth: '500px', background: 'linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.8))' }}>

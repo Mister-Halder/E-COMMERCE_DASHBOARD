@@ -2,6 +2,8 @@ import React, {useState, useEffect} from 'react'
 
 import {useNavigate} from 'react-router-dom'
 
+import API_BASE_URL from '../config';
+
 const SignUp=()=>{
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -14,7 +16,7 @@ const SignUp=()=>{
         if(auth) {
             navigate('/')
         }
-    }, [])
+    }, [navigate])
 
     const collectData = async () => {
         if (!name || !email || !password) {
@@ -23,23 +25,29 @@ const SignUp=()=>{
         }
 
         console.warn(name, email, password);
-        let result = await fetch("http://localhost:5000/register", {
-            method: 'post',
-            body: JSON.stringify({ name, email, password }),
-            headers: {
-                'Content-Type': 'application/json'
+        try {
+            let result = await fetch(`${API_BASE_URL}/register`, {
+                method: 'post',
+                body: JSON.stringify({ name, email, password }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            result = await result.json();
+            console.warn(result);
+            if (result && result.auth) {
+                localStorage.setItem("user", JSON.stringify(result.user));
+                localStorage.setItem("token", JSON.stringify(result.auth));
+                navigate('/')
+            } else {
+                alert("Please enter valid details");
             }
-        });
-        result = await result.json();
-        console.warn(result);
-        if (result && result.auth) {
-            localStorage.setItem("user", JSON.stringify(result.user));
-            localStorage.setItem("token", JSON.stringify(result.auth));
-            navigate('/')
-        } else {
-            alert("Please enter valid details");
+        } catch (err) {
+            console.error("Signup Error:", err);
+            alert(`Failed to connect to the server at ${API_BASE_URL}. Error: ${err.message}. Please ensure the backend is running.`);
         }
     }
+
 
     return(
         <div className="register">

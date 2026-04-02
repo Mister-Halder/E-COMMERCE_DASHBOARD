@@ -11,6 +11,7 @@ import UpdateProduct from './components/UpdateProduct';
 import Profile from './components/Profile';
 
 function App() {
+  const isDevelopment = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
   return (
     <div className="App">
       <BrowserRouter basename={process.env.PUBLIC_URL}>

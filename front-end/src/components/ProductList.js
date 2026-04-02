@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import API_BASE_URL from '../config';
+
 const ProductList = () => {
     const [products, setProducts] = useState([]);
 
@@ -9,48 +11,71 @@ const ProductList = () => {
     }, []);
 
     const getProducts = async () => {
-        let result = await fetch('http://localhost:5000/products', {
-            headers: {
-                authorization: `bearer ${JSON.parse(localStorage.getItem('token'))}`
+        let token = "";
+        try {
+            const storedToken = localStorage.getItem('token');
+            token = storedToken ? JSON.parse(storedToken) : "";
+        } catch (e) {
+            console.error("Error parsing token", e);
+        }
+
+        try {
+            let result = await fetch(`${API_BASE_URL}/products`, {
+                headers: {
+                    authorization: `bearer ${token}`
+                }
+            });
+            result = await result.json();
+            if (Array.isArray(result)) {
+                setProducts(result);
+            } else {
+                setProducts([]);
             }
-        });
-        result = await result.json();
-        if (Array.isArray(result)) {
-            setProducts(result);
-        } else {
+        } catch (err) {
+            console.error("Fetch Products Error:", err);
             setProducts([]);
         }
     }
 
     const deleteProduct = async (id) => {
-        let result = await fetch(`http://localhost:5000/product/${id}`, {
-            method: "Delete",
-            headers: {
-                authorization: `bearer ${JSON.parse(localStorage.getItem('token'))}`
-            }
-        });
-        result = await result.json();
-        if (result) {
-            getProducts(); // Refetch after successful deletion
-        }
-    }
-
-    const searchHandle = async (event) => {
-        let key = event.target.value;
-        if (key) {
-            let result = await fetch(`http://localhost:5000/search/${key}`, {
+        try {
+            let result = await fetch(`${API_BASE_URL}/product/${id}`, {
+                method: "Delete",
                 headers: {
                     authorization: `bearer ${JSON.parse(localStorage.getItem('token'))}`
                 }
             });
             result = await result.json();
             if (result) {
-                setProducts(result);
+                getProducts(); // Refetch after successful deletion
+            }
+        } catch (err) {
+            console.error("Delete Product Error:", err);
+            alert(`Failed to delete product at ${API_BASE_URL}. Error: ${err.message}`);
+        }
+    }
+
+    const searchHandle = async (event) => {
+        let key = event.target.value;
+        if (key) {
+            try {
+                let result = await fetch(`${API_BASE_URL}/search/${key}`, {
+                    headers: {
+                        authorization: `bearer ${JSON.parse(localStorage.getItem('token'))}`
+                    }
+                });
+                result = await result.json();
+                if (result) {
+                    setProducts(result);
+                }
+            } catch (err) {
+                console.error("Search Error:", err);
             }
         } else {
             getProducts(); // Restores original list if search is empty
         }
     }
+
 
     return (
         <div className="product-list-container">

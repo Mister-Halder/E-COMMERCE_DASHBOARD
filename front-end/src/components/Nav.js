@@ -5,7 +5,15 @@ const Nav=()=>{
     const auth = localStorage.getItem('user');
     const navigate = useNavigate();
     const location = useLocation();
-    const user = auth ? JSON.parse(auth) : null;
+    
+    // Safely parse user data
+    let user = null;
+    try {
+        user = auth ? JSON.parse(auth) : null;
+    } catch (e) {
+        console.error("Failed to parse user data from localStorage", e);
+        user = null;
+    }
 
     const logout=()=>{
         localStorage.clear();
@@ -13,7 +21,7 @@ const Nav=()=>{
     }
     return(
         <nav>
-            { auth ? <ul className="nav-ul">
+            { auth && user ? <ul className="nav-ul">
                 <li>
                     <img alt="logo" className='logo' 
                     src={`${process.env.PUBLIC_URL}/logo.png`} />
@@ -40,15 +48,15 @@ const Nav=()=>{
                         fontWeight: 'bold',
                         color: 'var(--text-primary)'
                     }}>
-                        {user.profileImage ? (
+                        {user && user.profileImage ? (
                             <img src={user.profileImage} alt="nav-profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
-                            <span>{user.name.charAt(0).toUpperCase()}</span>
+                            <span>{user && user.name ? user.name.charAt(0).toUpperCase() : '?'}</span>
                         )}
                     </div>
                     <Link to="/profile">Profile</Link>
                 </li>
-                <li className="nav-right"><Link onClick={logout} to="/signup" className="logout-btn">Logout ({user.name})</Link></li>
+                <li className="nav-right"><Link onClick={logout} to="/signup" className="logout-btn">Logout ({user && user.name ? user.name : 'User'})</Link></li>
             </ul>
             :
             <ul className="nav-ul nav-right">

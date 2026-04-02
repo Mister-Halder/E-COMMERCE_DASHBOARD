@@ -94,32 +94,21 @@
   height: 50px;
   border-radius: 50%;
   margin-right: 25px;
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
-  animation: floatProfile 3s ease-in-out infinite;
-  transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+  animation: floatProfileSimple 4s ease-in-out infinite;
+  transition: all 0.3s ease;
   cursor: pointer;
-  filter: drop-shadow(0 0 5px rgba(99, 102, 241, 0.6));
 }
 
 .logo:hover {
-    transform: rotate(360deg) scale(1.1);
-    filter: drop-shadow(0 0 15px rgba(139, 92, 246, 0.8));
-    box-shadow: 0 0 40px rgba(139, 92, 246, 0.6);
+    transform: scale(1.05);
+    box-shadow: 0 8px 15px rgba(99, 102, 241, 0.5);
 }
 
-@keyframes floatProfile {
-    0% {
-        transform: translateY(0px) rotate(0deg);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    }
-    50% {
-        transform: translateY(-8px) rotate(2deg);
-        box-shadow: 0 20px 30px rgba(99, 102, 241, 0.4);
-    }
-    100% {
-        transform: translateY(0px) rotate(0deg);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    }
+@keyframes floatProfileSimple {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+    100% { transform: translateY(0); }
 }
 
 /* ----- Footer ----- */
@@ -156,14 +145,14 @@
     max-width: 450px;
     opacity: 0;
     animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.4s ease;
 }
 
 .register:hover, .login:hover, .product:hover {
-    transform: scale(1.04);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(99, 102, 241, 0.2);
-    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3), 0 0 20px rgba(99, 102, 241, 0.15);
+    border-color: rgba(99, 102, 241, 0.4);
 }
+
 
 .register h1, .login h1, .product h1 {
     margin-bottom: 30px;
@@ -191,8 +180,10 @@
 }
 
 .inputBox:hover {
-    background: rgba(30, 41, 59, 0.9);
-    border-color: rgba(99, 102, 241, 0.4);
+    background: rgba(30, 41, 59, 0.6); /* Softer glass-like background */
+    border-color: rgba(99, 102, 241, 0.6);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15); /* Soft glow */
+    transform: translateY(-2px); /* Tiny lift up */
 }
 
 .inputBox:focus {
@@ -306,10 +297,9 @@
 }
 
 .product-card:hover {
-    transform: scale(1.08);
-    box-shadow: 0 25px 35px -5px rgba(0, 0, 0, 0.3), 0 0 25px rgba(99, 102, 241, 0.3);
-    border-color: var(--primary-color);
-    background: rgba(30, 41, 59, 0.85); /* Slightly less transparent on hover */
+    transform: translateY(-4px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3), 0 0 20px rgba(99, 102, 241, 0.15);
+    border-color: rgba(99, 102, 241, 0.5);
 }
 
 .product-badge {

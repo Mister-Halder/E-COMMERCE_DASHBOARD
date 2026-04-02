@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
+import API_BASE_URL from '../config';
+
 const UpdateProduct = () => {
     const [name, setName] = React.useState('');
     const [price, setPrice] = React.useState('');
@@ -15,17 +17,23 @@ const UpdateProduct = () => {
     }, []);
 
     const getProductDetails = async () => {
-        console.warn(params);
-        let result = await fetch(`http://localhost:5000/product/${params.id}`, {
-            headers: {
-                authorization: `bearer ${JSON.parse(localStorage.getItem('token'))}`
+        try {
+            let result = await fetch(`${API_BASE_URL}/product/${params.id}`, {
+                headers: {
+                    authorization: `bearer ${JSON.parse(localStorage.getItem('token'))}`
+                }
+            });
+            result = await result.json();
+            if (result) {
+                setName(result.name);
+                setPrice(result.price);
+                setCategory(result.category);
+                setCompany(result.company);
             }
-        });
-        result = await result.json();
-        setName(result.name);
-        setPrice(result.price);
-        setCategory(result.category);
-        setCompany(result.company);
+        } catch (err) {
+            console.error("Get Product Details Error:", err);
+            alert(`Failed to fetch product details from ${API_BASE_URL}. Error: ${err.message}`);
+        }
     }
 
     const updateProduct = async () => {
@@ -35,21 +43,27 @@ const UpdateProduct = () => {
             return false;
         }
 
-        console.warn(name, price, category, company);
-        let result = await fetch(`http://localhost:5000/product/${params.id}`, {
-            method: 'Put',
-            body: JSON.stringify({ name, price, category, company }),
-            headers: {
-                'Content-Type': 'application/json',
-                authorization: `bearer ${JSON.parse(localStorage.getItem('token'))}`
+        try {
+            console.warn(name, price, category, company);
+            let result = await fetch(`${API_BASE_URL}/product/${params.id}`, {
+                method: 'Put',
+                body: JSON.stringify({ name, price, category, company }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    authorization: `bearer ${JSON.parse(localStorage.getItem('token'))}`
+                }
+            });
+            result = await result.json();
+            console.warn(result);
+            if (result) {
+                navigate('/');
             }
-        });
-        result = await result.json();
-        console.warn(result);
-        if(result) {
-            navigate('/');
+        } catch (err) {
+            console.error("Update Product Error:", err);
+            alert(`Failed to update product at ${API_BASE_URL}. Error: ${err.message}`);
         }
     }
+
 
     return (
         <div className='product'>
