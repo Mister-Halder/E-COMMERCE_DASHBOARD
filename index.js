@@ -50,7 +50,8 @@ app.post("/upload-profile/:id", verifyToken, upload.single('profileImage'), asyn
             return resp.status(400).send({ result: "Please upload a file" });
         }
         
-        let imageUrl = `http://localhost:5000/uploads/${req.file.filename}`;
+        // Use dynamic host for production (Render) instead of hardcoding localhost
+        let imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
         
         let result = await User.updateOne(
             { _id: req.params.id },
@@ -189,6 +190,7 @@ app.get("/search/:key", verifyToken, async (req, resp) => {
     resp.send(result);
 });
 
-app.listen(5000, "0.0.0.0", () => {
-    console.log("Server is running on http://localhost:5000");
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server is running on port ${PORT}`);
 });
