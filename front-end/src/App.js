@@ -9,6 +9,11 @@ import AddProduct from './components/AddProduct';
 import ProductList from './components/ProductList';
 import UpdateProduct from './components/UpdateProduct';
 import Profile from './components/Profile';
+import Cart from './components/Cart';
+import Orders from './components/Orders';
+import AdminDashboard from './components/AdminDashboard';
+import AdminPrivateComponent from './components/AdminPrivateComponent';
+import Home from './components/Home';
 
 function App() {
   const isDevelopment = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
@@ -17,13 +22,23 @@ function App() {
       <BrowserRouter basename={process.env.PUBLIC_URL}>
       <Nav />
       <Routes>
+        {/* Customer Private Routes */}
         <Route element={<PrivateComponent />}>
-        <Route path="/" element={<ProductList />} />
-        <Route path="/add" element={<AddProduct />} />
-        <Route path="/update/:id" element={<UpdateProduct />} />
-        <Route path="/logout" element={<h1>Logout Component</h1>} />
-        <Route path="/profile" element={<Profile />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/products" element={<ProductList />} />
+          <Route path="/add" element={<AddProduct />} />
+          <Route path="/update/:id" element={<UpdateProduct />} />
+          <Route path="/logout" element={<h1>Logout Component</h1>} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/orders" element={<Orders />} />
         </Route>
+
+        {/* Admin Protected Routes */}
+        <Route element={<AdminPrivateComponent />}>
+          <Route path="/admin" element={<AdminDashboard />} />
+        </Route>
+
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
       </Routes>

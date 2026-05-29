@@ -93,7 +93,7 @@ const Profile = () => {
 
     return (
         <div className="product profile-container" style={{ maxWidth: '500px', background: 'linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.8))' }}>
-            <h1>User Profile</h1>
+            <h1>{userData && userData.role === 'admin' ? "ADMIN PROFILE" : "USER PROFILE"}</h1>
             {userData ? (
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', padding: '10px' }}>
                     

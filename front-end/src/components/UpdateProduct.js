@@ -43,11 +43,20 @@ const UpdateProduct = () => {
             return false;
         }
 
+        // Sanitize price (remove currency symbol or commas if any)
+        const cleanPrice = String(price).replace(/[$,]/g, '');
+        const parsedPrice = parseFloat(cleanPrice);
+        if (isNaN(parsedPrice) || parsedPrice < 0) {
+            setError(true);
+            alert("Please enter a valid numeric price");
+            return false;
+        }
+
         try {
             console.warn(name, price, category, company);
             let result = await fetch(`${API_BASE_URL}/product/${params.id}`, {
                 method: 'Put',
-                body: JSON.stringify({ name, price, category, company }),
+                body: JSON.stringify({ name, price: parsedPrice.toFixed(2), category, company }),
                 headers: {
                     'Content-Type': 'application/json',
                     authorization: `bearer ${JSON.parse(localStorage.getItem('token'))}`
@@ -56,7 +65,13 @@ const UpdateProduct = () => {
             result = await result.json();
             console.warn(result);
             if (result) {
-                navigate('/');
+                const auth = localStorage.getItem('user');
+                const user = auth ? JSON.parse(auth) : null;
+                if (user && user.role === 'admin') {
+                    navigate('/admin');
+                } else {
+                    navigate('/');
+                }
             }
         } catch (err) {
             console.error("Update Product Error:", err);
@@ -73,7 +88,7 @@ const UpdateProduct = () => {
             />
             {error && !name && <span className='invalid-input'>Enter valid name</span>}
 
-            <input type="text" placeholder='Enter product price' className='inputBox'
+            <input type="number" step="0.01" min="0" placeholder='Enter product price' className='inputBox'
                 value={price} onChange={(e) => { setPrice(e.target.value) }}
             />
             {error && !price && <span className='invalid-input'>Enter valid price</span>}

@@ -23,26 +23,36 @@ const Login=()=>{
 
         console.warn("email, password", email, password)
         try {
-            let result = await fetch(`${API_BASE_URL}/login`, {
+            let response = await fetch(`${API_BASE_URL}/login`, {
                 method: 'post',
-                body: JSON.stringify({email, password}),
+                body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
                 headers: {
                     'Content-Type': 'application/json'
                 }
             });
-            result = await result.json();
-            console.warn(result)
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const contentType = response.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                throw new Error("Server returned an invalid HTML/text page. The backend server might be offline.");
+            }
+
+            let result = await response.json();
+            console.warn(result);
             if (result.auth) {
                 localStorage.setItem("user", JSON.stringify(result.user));
                 localStorage.setItem("token", JSON.stringify(result.auth));
-                navigate("/")
+                navigate(result.user.role === 'admin' ? '/admin' : '/');
             }
             else {
-                alert("please enter correct details")
+                alert("please enter correct details");
             }
         } catch (err) {
             console.error("Login Error:", err);
-            alert(`Failed to connect to the server at ${API_BASE_URL}. Error: ${err.message}. Please ensure the backend is running.`);
+            alert(`Failed to connect to the server. Error: ${err.message}. Please ensure the backend is running.`);
         }
     }
 
